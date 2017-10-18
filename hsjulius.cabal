@@ -20,6 +20,9 @@ library
   -- other-modules:
   -- other-extensions:
   build-depends:       base >=4.9 && <4.10
+                     , vector
+                     , bytestring
+
   hs-source-dirs:      src
   c-sources:           csrc/julius_interface.c
   --extra-libraries:     julius, sent

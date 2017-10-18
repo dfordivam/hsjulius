@@ -1,4 +1,5 @@
 #include <julius/juliuslib.h>
+#include "Interface_stub.h"
 
 Recog*
 c_init_julius_int(int argc, char *argv[]);
@@ -142,3 +143,30 @@ c_init_julius_int(int argc, char *argv[])
 /*   /\* exit program *\/ */
 /*   return(0); */
 /* } */
+
+void
+c_get_result_confnet (Recog *recog, HsStablePtr *hsStruct)
+{
+  CN_CLUSTER *c;
+  int i;
+  RecogProcess *r;
+  boolean multi;
+
+  if (recog->process_list->next != NULL) multi = TRUE;
+  else multi = FALSE;
+
+  for(r=recog->process_list;r;r=r->next) {
+    if (! r->live) continue;
+    if (r->result.confnet == NULL) continue;	/* no confnet obtained */
+
+    int row = 0;
+    for(c=r->result.confnet;c; row++, c=c->next) {
+      for(i=0;i<c->wordsnum;i++) {
+        char* cStar = (c->words[i] == WORD_INVALID) ? "-" : r->lm->winfo->woutput[c->words[i]];
+        float val = c->pp[i];
+        hsAddConfNetData(hsStruct, row, cStar, val);
+      }
+    }
+    break;
+  }
+}
