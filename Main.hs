@@ -1,6 +1,7 @@
 module Main where
 
 import NLP.Julius.Interface
+import MFCC
 
 -- Compile command
 
@@ -12,4 +13,7 @@ import NLP.Julius.Interface
 main = do
   print "Hello"
   v <- c_init_julius
+  bs <- getMelDataFromWave "try.wav"
+  confData <- computeConfusionDataFromMelData v bs
+  print confData
   return()

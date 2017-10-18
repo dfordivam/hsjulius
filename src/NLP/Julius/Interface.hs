@@ -26,7 +26,7 @@ foreign import ccall unsafe "j_clean_recog_work_area"
   :: Ptr RecogMain
   -> IO ()
 
-foreign import ccall unsafe "c_get_result_confnet"
+foreign import ccall safe "c_get_result_confnet"
   c_get_result_confnet
   :: Ptr RecogMain
   -> StablePtr (IORef ConfusionData)
@@ -48,9 +48,13 @@ computeConfusionDataFromMelData
   -> ByteString
   -> IO (ConfusionData)
 computeConfusionDataFromMelData r bs = do
+  let
+    frameNum l = floor ((fromIntegral l)/(4*40))
+    -- FrameNum * 10ms * 16Khz
+    getSpeechLen l = 16* (10*(frameNum l - 1))
   useAsCStringLen bs
     (\(cstr, len) -> j_recognize_stream_simplified r cstr
-      (fromInteger $ toInteger len))
+      (getSpeechLen len))
   confDataPtr <- join $ newStablePtr <$> newIORef V.empty
   c_get_result_confnet r confDataPtr
   j_clean_recog_work_area r
@@ -68,9 +72,10 @@ hsAddConfNetData ptr (CInt crow) cstr (CFloat float) = do
   vecRef <- deRefStablePtr ptr
   vec <- readIORef vecRef
   str <- peekCString cstr
-  let newRow = maybe ((NE.:|) val []) (\ne -> NE.cons val ne) oldRow
+  let newRow = ((NE.:|) val [])
       oldRow = (V.!?) vec row
       row = fromIntegral crow
       val = (float, str)
-      newVec = (V.//) vec [(row, newRow)]
+      newVec = maybe (V.cons newRow vec)
+        (\ne -> (V.//) vec [(row, NE.cons val ne)]) oldRow
   writeIORef vecRef newVec

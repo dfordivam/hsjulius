@@ -14,6 +14,7 @@ c_init_julius() {
     ,"am-dnn.jconf"
     ,"-dnnconf"
     ,"julius.dnnconf"
+    ,"-confnet"
     /* "-C main.jconf -C am-dnn.jconf -dnnconf julius.dnnconf" */
     , NULL
   };
@@ -167,6 +168,5 @@ c_get_result_confnet (Recog *recog, HsStablePtr *hsStruct)
         hsAddConfNetData(hsStruct, row, cStar, val);
       }
     }
-    break;
   }
 }
