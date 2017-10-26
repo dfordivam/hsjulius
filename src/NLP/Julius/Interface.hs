@@ -1,4 +1,8 @@
-module NLP.Julius.Interface where
+module NLP.Julius.Interface
+  ( c_init_julius
+  , computeConfusionDataFromMelData
+  , ConfusionData (..))
+  where
 
 import Foreign
 import Foreign.C.Types
