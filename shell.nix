@@ -8,8 +8,9 @@ let
   stdenv = pkgs.stdenv;
 
   julius = hsPkgs.callPackage ../julius/default.nix {};
-  hsmfcc = hsPkgs.callPackage ../hsmfcc/default.nix {};
+  #hsmfcc = hsPkgs.callPackage ../hsmfcc/default.nix {};
 
-  drv = hsPkgs.callPackage ./default.nix {inherit hsmfcc julius;};
+  pretty-simple = hsPkgs.callPackage ~/repos/pretty-simple        {};
+  drv = hsPkgs.callPackage ./default.nix {inherit pretty-simple julius;};
 
 in if pkgs.lib.inNixShell then drv.env else drv

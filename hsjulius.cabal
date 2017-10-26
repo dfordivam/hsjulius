@@ -26,5 +26,14 @@ library
   hs-source-dirs:      src
   c-sources:           csrc/julius_interface.c
   --extra-libraries:     julius, sent
-  cc-options:     libjulius.a libsent.a
+  default-language:    Haskell2010
+
+executable hsjulius
+  main-is:             Main.hs
+  -- other-extensions:
+  build-depends:       base >=4.9 && <4.10
+                     , hsjulius
+                     , bytestring
+                     , pretty-simple
+  ghc-Options: -pgml gcc "-optl-Wl,--allow-multiple-definition" "-optl-Wl,--whole-archive" "-optl-Wl,-Bstatic" "-optl-Wl,-ljulius" "-optl-Wl,-lsent" "-optl-Wl,-Bdynamic" "-optl-Wl,--no-whole-archive"
   default-language:    Haskell2010
