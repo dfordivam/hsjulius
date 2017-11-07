@@ -1,7 +1,8 @@
 module NLP.Julius.Interface
   ( c_init_julius
   , computeConfusionDataFromMelData
-  , ConfusionData (..))
+  , RecogMainPtr
+  , ConfusionData )
   where
 
 import Foreign
@@ -16,7 +17,7 @@ import qualified Data.Vector as V
 import Data.IORef
 
 foreign import ccall unsafe "c_init_julius"
-               c_init_julius :: IO (Ptr RecogMain)
+               c_init_julius :: IO (RecogMainPtr)
 
 foreign import ccall unsafe "j_recognize_stream_simplified"
   j_recognize_stream_simplified
@@ -38,6 +39,8 @@ foreign import ccall safe "c_get_result_confnet"
 
 data RecogMain = RecogMain
 
+type RecogMainPtr = Ptr RecogMain
+
 type ConfusionData = Vector (NonEmpty (Float, String))
 
 foreign export ccall hsAddConfNetData
@@ -53,9 +56,9 @@ computeConfusionDataFromMelData
   -> IO (ConfusionData)
 computeConfusionDataFromMelData r bs = do
   let
-    frameNum l = floor ((fromIntegral l)/(4*40))
+    frameNum l = floor ((fromIntegral l) / (4 * 40))
     -- FrameNum * 10ms * 16Khz
-    getSpeechLen l = 16* (10*(frameNum l - 1))
+    getSpeechLen l = 16 * (10 * (frameNum l - 1))
   useAsCStringLen bs
     (\(cstr, len) -> j_recognize_stream_simplified r cstr
       (getSpeechLen len))
